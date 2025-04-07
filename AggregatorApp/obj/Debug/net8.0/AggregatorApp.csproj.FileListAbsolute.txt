@@ -1,0 +1,15 @@
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\bin\Debug\net8.0\AggregatorApp.exe
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\bin\Debug\net8.0\AggregatorApp.deps.json
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\bin\Debug\net8.0\AggregatorApp.runtimeconfig.json
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\bin\Debug\net8.0\AggregatorApp.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\bin\Debug\net8.0\AggregatorApp.pdb
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.AssemblyInfoInputs.cache
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.AssemblyInfo.cs
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.csproj.CoreCompileInputs.cache
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.sourcelink.json
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\refint\AggregatorApp.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.pdb
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.genruntimeconfig.cache
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\ref\AggregatorApp.dll
