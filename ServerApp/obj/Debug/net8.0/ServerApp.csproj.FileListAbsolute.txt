@@ -1,0 +1,15 @@
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\bin\Debug\net8.0\ServerApp.exe
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\bin\Debug\net8.0\ServerApp.deps.json
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\bin\Debug\net8.0\ServerApp.runtimeconfig.json
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\bin\Debug\net8.0\ServerApp.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\bin\Debug\net8.0\ServerApp.pdb
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\obj\Debug\net8.0\ServerApp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\obj\Debug\net8.0\ServerApp.AssemblyInfoInputs.cache
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\obj\Debug\net8.0\ServerApp.AssemblyInfo.cs
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\obj\Debug\net8.0\ServerApp.csproj.CoreCompileInputs.cache
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\obj\Debug\net8.0\ServerApp.sourcelink.json
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\obj\Debug\net8.0\ServerApp.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\obj\Debug\net8.0\refint\ServerApp.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\obj\Debug\net8.0\ServerApp.pdb
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\obj\Debug\net8.0\ServerApp.genruntimeconfig.cache
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\ServerApp\obj\Debug\net8.0\ref\ServerApp.dll
