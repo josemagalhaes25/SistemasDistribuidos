@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Utilizador\\source\\repos\\SistemasDistribuidos\\WavyApp\\WavyApp.csproj": {}
+    "C:\\Users\\Utilizador\\Source\\Repos\\SistemasDistribuidos\\WavyApp\\WavyApp.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Utilizador\\source\\repos\\SistemasDistribuidos\\WavyApp\\WavyApp.csproj": {
+    "C:\\Users\\Utilizador\\Source\\Repos\\SistemasDistribuidos\\WavyApp\\WavyApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Utilizador\\source\\repos\\SistemasDistribuidos\\WavyApp\\WavyApp.csproj",
+        "projectUniqueName": "C:\\Users\\Utilizador\\Source\\Repos\\SistemasDistribuidos\\WavyApp\\WavyApp.csproj",
         "projectName": "WavyApp",
-        "projectPath": "C:\\Users\\Utilizador\\source\\repos\\SistemasDistribuidos\\WavyApp\\WavyApp.csproj",
+        "projectPath": "C:\\Users\\Utilizador\\Source\\Repos\\SistemasDistribuidos\\WavyApp\\WavyApp.csproj",
         "packagesPath": "C:\\Users\\Utilizador\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Utilizador\\source\\repos\\SistemasDistribuidos\\WavyApp\\obj\\",
+        "outputPath": "C:\\Users\\Utilizador\\Source\\Repos\\SistemasDistribuidos\\WavyApp\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

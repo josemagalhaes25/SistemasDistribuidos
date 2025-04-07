@@ -10,24 +10,28 @@ namespace WavyApp
     {
         static void Main(string[] args)
         {
-            string aggregatorIp = "127.0.0.1"; // ou IP real se for outro PC
+            // Define o IP do Agregador (pode ser 127.0.0.1 se estiver localmente)
+            string aggregatorIp = "127.0.0.1";
             int port = 5000;
+
+            // ID único deste dispositivo WAVY
             string wavyId = "WAVY_001";
 
             try
             {
+                // Cria uma ligação TCP com o Agregador
                 using (TcpClient client = new TcpClient(aggregatorIp, port))
                 using (NetworkStream stream = client.GetStream())
                 {
-                    // Enviar mensagem de HELLO com o ID
+                    // Envia uma mensagem inicial de "HELLO" com o ID do dispositivo
                     SendMessage(stream, $"HELLO;{wavyId}");
                     Console.WriteLine("HELLO enviado.");
 
-                    // Esperar ACK
+                    // Aguarda resposta do Agregador (espera um ACK ou algo semelhante)
                     string response = ReceiveMessage(stream);
                     Console.WriteLine("Resposta do Agregador: " + response);
 
-                    // Enviar dados simulados
+                    // Simula o envio de dados de sensores
                     string[] dataSamples =
                     {
                         "DATA;TemperaturaAgua;20.5",
@@ -36,33 +40,38 @@ namespace WavyApp
                         "DATA;VelocidadeVento;15.2"
                     };
 
+                    // Envia cada amostra de dados com 1 segundo de intervalo
                     foreach (var data in dataSamples)
                     {
                         SendMessage(stream, data);
                         Console.WriteLine("Enviado: " + data);
-                        Thread.Sleep(1000); // Espera 1 segundo entre mensagens
+                        Thread.Sleep(1000); // Pausa de 1 segundo entre mensagens
                     }
 
-                    // Enviar BYE e fechar
+                    // Após envio dos dados, envia mensagem de despedida "BYE"
                     SendMessage(stream, "BYE");
                     Console.WriteLine("BYE enviado.");
                 }
             }
             catch (Exception ex)
             {
+                // Em caso de erro na ligação ou comunicação
                 Console.WriteLine("Erro: " + ex.Message);
             }
 
+            // Espera o utilizador pressionar uma tecla antes de encerrar o programa
             Console.WriteLine("Pressiona qualquer tecla para sair...");
             Console.ReadKey();
         }
 
+        // Função que envia uma mensagem para o Agregador via stream
         static void SendMessage(NetworkStream stream, string message)
         {
             byte[] buffer = Encoding.UTF8.GetBytes(message);
             stream.Write(buffer, 0, buffer.Length);
         }
 
+        // Função que recebe uma mensagem da stream do Agregador
         static string ReceiveMessage(NetworkStream stream)
         {
             byte[] buffer = new byte[256];

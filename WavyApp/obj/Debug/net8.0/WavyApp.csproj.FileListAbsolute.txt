@@ -1,0 +1,15 @@
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\bin\Debug\net8.0\WavyApp.exe
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\bin\Debug\net8.0\WavyApp.deps.json
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\bin\Debug\net8.0\WavyApp.runtimeconfig.json
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\bin\Debug\net8.0\WavyApp.dll
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\bin\Debug\net8.0\WavyApp.pdb
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\obj\Debug\net8.0\WavyApp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\obj\Debug\net8.0\WavyApp.AssemblyInfoInputs.cache
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\obj\Debug\net8.0\WavyApp.AssemblyInfo.cs
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\obj\Debug\net8.0\WavyApp.csproj.CoreCompileInputs.cache
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\obj\Debug\net8.0\WavyApp.sourcelink.json
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\obj\Debug\net8.0\WavyApp.dll
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\obj\Debug\net8.0\refint\WavyApp.dll
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\obj\Debug\net8.0\WavyApp.pdb
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\obj\Debug\net8.0\WavyApp.genruntimeconfig.cache
+C:\Users\Utilizador\Source\Repos\SistemasDistribuidos\WavyApp\obj\Debug\net8.0\ref\WavyApp.dll
