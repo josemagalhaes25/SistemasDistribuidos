@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Novo Perfil",
+    "Projects": [
+      {
+        "Name": "WavyApp.csproj",
+        "Action": "Start"
+      },
+      {
+        "Name": "..\\WavyApp2\\WavyApp2.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

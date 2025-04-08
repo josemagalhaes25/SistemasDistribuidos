@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WavyApp2")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ab5a377dd7e3c06435f2fa4879a25871d21f8acb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e5fb1a5548a9d4164b1d07cb191189026dcdb744")]
 [assembly: System.Reflection.AssemblyProductAttribute("WavyApp2")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WavyApp2")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

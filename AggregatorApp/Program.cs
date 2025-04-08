@@ -1,156 +1,110 @@
 ﻿using System;
-using System.IO;
-using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Net;
 using System.Threading;
-using System.Collections.Generic;
 
 class Program
 {
-    // Dicionário para armazenar os sensores registados por cada dispositivo Wavy
-    static Dictionary<string, List<string>> sensoresPorWavy = new();
-
-    // Caminho para a pasta de configuração onde serão guardados os ficheiros
-    static string configPath = "config";
+    // Porta onde este agregador escuta as mensagens do WAVY
+    static int portaWavy = 5000;
+    // Porta e IP do servidor principal onde serão enviados os dados agregados
+    static int portaServer = 6000;
+    static string ipServer = "127.0.0.1";  // localhost
 
     static void Main(string[] args)
     {
-        // Cria a pasta de configuração se não existir
-        Directory.CreateDirectory(configPath);
+        // Cria um listener TCP para receber conexões do WAVY
+        TcpListener listener = new TcpListener(IPAddress.Any, portaWavy);
+        listener.Start();
+        Console.WriteLine($"Agregador a escutar na porta {portaWavy}...");
 
-        // Configura o servidor TCP na porta 5000
-        int port = 5000;
-        TcpListener server = new TcpListener(IPAddress.Any, port);
-        server.Start();
-        Console.WriteLine("[Agregador] A escutar na porta 5000...");
-
-        // Loop principal do servidor para aceitar ligações de clientes
+        // Loop infinito para aceitar múltiplos clientes WAVY
         while (true)
         {
-            // Aceita uma nova ligação de cliente
-            TcpClient client = server.AcceptTcpClient();
-
-            // Cria uma thread separada para lidar com cada cliente
-            Thread thread = new Thread(() => HandleClient(client));
+            // Aceita uma conexão do WAVY (bloqueante)
+            TcpClient wavyClient = listener.AcceptTcpClient();
+            // Cria uma thread separada para cada cliente WAVY
+            Thread thread = new(() => HandleWavy(wavyClient));
             thread.Start();
         }
     }
 
-    // Método para lidar com a comunicação de cada cliente Wavy
-    static void HandleClient(TcpClient client)
+    // Método para processar cada cliente WAVY conectado
+    static void HandleWavy(TcpClient client)
     {
-        string wavyId = "";
+        using NetworkStream wavyStream = client.GetStream();
+        byte[] buffer = new byte[256];  // Buffer de 256 bytes
+        int bytesRead;
 
-        // Obtém o endereço IP do cliente Wavy
-        string wavyIp = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
-
-        using (NetworkStream stream = client.GetStream())
+        try
         {
-            byte[] buffer = new byte[256];
-            int bytesRead;
-
-            // Fica à espera de mensagens do cliente
-            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+            // Fica a ler continuamente os dados do WAVY
+            while ((bytesRead = wavyStream.Read(buffer, 0, buffer.Length)) > 0)
             {
-                string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Console.WriteLine("[Recebido] " + message);
+                string mensagem = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                Console.WriteLine("Mensagem recebida do WAVY: " + mensagem);
 
-                // Divide a mensagem recebida em partes
-                string[] parts = message.Split(';');
-                string response = "ACK"; // Resposta padrão
-
-                // Processa diferentes tipos de mensagens
-                if (parts[0] == "HELLO" && parts.Length == 2)
+                // Verifica se é uma mensagem de dados (formato: "DATA;...")
+                if (mensagem.StartsWith("DATA;"))
                 {
-                    // Mensagem de apresentação do Wavy
-                    wavyId = parts[1];
-                    response = "ACK";
-                }
-                else if (parts[0] == "REGISTER" && parts.Length == 2)
-                {
-                    // Mensagem de registo de sensores
-                    List<string> sensores = new(parts[1].Split(','));
-                    sensoresPorWavy[wavyId] = sensores;
+                    // Transforma a mensagem para o formato do servidor principal
+                    string mensagemServer = $"AGG_DATA;{mensagem}";
 
-                    // Guarda a configuração em ficheiro
-                    GravarConfig(wavyId, sensores, wavyIp);
-                    response = "ACK";
-                }
-                else if (parts[0] == "DATA" && parts.Length == 3)
-                {
-                    // Mensagem com dados de sensores
-                    string tipo = parts[1];
-                    string valor = parts[2];
+                    // Envia para o servidor principal e obtém resposta
+                    string resposta = EnviarParaServidor(mensagemServer);
+                    Console.WriteLine("Resposta do Servidor: " + resposta);
 
-                    // Verifica se o sensor está registado
-                    if (sensoresPorWavy.ContainsKey(wavyId) && sensoresPorWavy[wavyId].Contains(tipo))
-                    {
-                        // Guarda os dados em ficheiro CSV
-                        GuardarEmCSV(tipo, wavyId, valor, wavyIp);
-
-                        // Reencaminha os dados para o servidor principal
-                        ForwardToServer(tipo, valor);
-                        response = "ACK";
-                    }
-                    else
-                    {
-                        response = "ERROR;Sensor não registado";
-                    }
-                }
-                else if (message == "BYE")
-                {
-                    // Mensagem de despedida
-                    response = "BYE_ACK";
-                    byte[] byeResponse = Encoding.UTF8.GetBytes(response);
-                    stream.Write(byeResponse, 0, byeResponse.Length);
-                    break; // Termina a ligação
+                    // Envia confirmação de receção ao WAVY
+                    SendResponse(wavyStream, "RECEIVED");
                 }
                 else
                 {
-                    // Mensagem não reconhecida
-                    response = "ERROR;Mensagem inválida";
+                    // Responde com ACK (acknowledgment) para outras mensagens
+                    SendResponse(wavyStream, "ACK");
                 }
-
-                // Envia a resposta ao cliente
-                byte[] reply = Encoding.UTF8.GetBytes(response);
-                stream.Write(reply, 0, reply.Length);
             }
         }
-        client.Close(); // Fecha a ligação com o cliente
+        catch (Exception ex)
+        {
+            Console.WriteLine("Erro: " + ex.Message);
+        }
+        finally
+        {
+            // Garante que a conexão é fechada
+            client.Close();
+        }
     }
 
-    // Grava as informações de registo no ficheiro config_wavys.csv
-    static void GravarConfig(string wavyId, List<string> sensores, string ip)
-    {
-        string linha = $"{wavyId}:ativa:[{string.Join(",", sensores)}]:{DateTime.Now:yyyy-MM-ddTHH:mm:ss}";
-        File.AppendAllText(Path.Combine(configPath, "config_wavys.csv"), linha + Environment.NewLine);
-    }
-
-    // Guarda os dados em ficheiros CSV separados por tipo de sensor
-    static void GuardarEmCSV(string tipo, string wavyId, string valor, string ip)
-    {
-        string linha = $"{wavyId}:media:{valor}:{ip}";
-        string ficheiro = Path.Combine(configPath, $"{tipo}.csv");
-        File.AppendAllText(ficheiro, linha + Environment.NewLine);
-    }
-
-    // Reencaminha os dados para o servidor principal (na porta 6000)
-    static void ForwardToServer(string tipo, string valor)
+    // Método para enviar mensagens ao servidor principal
+    static string EnviarParaServidor(string msg)
     {
         try
         {
-            using (TcpClient serverClient = new TcpClient("127.0.0.1", 6000))
-            using (NetworkStream stream = serverClient.GetStream())
-            {
-                string msg = $"FORWARD;AGG_DATA;{tipo};{valor}";
-                byte[] data = Encoding.UTF8.GetBytes(msg);
-                stream.Write(data, 0, data.Length);
-            }
+            // Cria conexão com o servidor principal
+            using TcpClient serverClient = new TcpClient(ipServer, portaServer);
+            using NetworkStream stream = serverClient.GetStream();
+
+            // Envia a mensagem
+            byte[] data = Encoding.UTF8.GetBytes(msg);
+            stream.Write(data, 0, data.Length);
+
+            // Aguarda e lê a resposta do servidor
+            byte[] buffer = new byte[256];
+            int bytes = stream.Read(buffer, 0, buffer.Length);
+
+            return Encoding.UTF8.GetString(buffer, 0, bytes);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Console.WriteLine("[Erro ao contactar servidor] " + e.Message);
+            return "Erro ao contactar servidor: " + ex.Message;
         }
+    }
+
+    // Método auxiliar para enviar respostas ao WAVY
+    static void SendResponse(NetworkStream stream, string response)
+    {
+        byte[] data = Encoding.UTF8.GetBytes(response);
+        stream.Write(data, 0, data.Length);
     }
 }
