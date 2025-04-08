@@ -1,82 +1,121 @@
 ﻿using System;
-using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace WavyApp
 {
     internal class Program
     {
+        // Identificador único deste dispositivo Wavy
+        static string wavyId = "WAVY_001";
+
+        // Endereço IP do agregador (servidor) e porta de comunicação
+        static string aggregatorIp = "127.0.0.1";
+        static int port = 5000;
+
+        // Cliente TCP e stream de comunicação
+        static TcpClient client;
+        static NetworkStream stream;
+
+        // Flag para controlar o estado da aplicação
+        static bool running = true;
+
+        // Gerador de números aleatórios para simular dados dos sensores
+        static Random rand = new();
+
+        // Lista de sensores disponíveis neste dispositivo
+        static List<string> sensores = new() { "Temperatura", "Salinidade", "Ondas", "Vento" };
+
         static void Main(string[] args)
         {
-            // Define o IP do Agregador (pode ser 127.0.0.1 se estiver localmente)
-            string aggregatorIp = "127.0.0.1";
-            int port = 5000;
-
-            // ID único deste dispositivo WAVY
-            string wavyId = "WAVY_001";
+            // Configura o handler para o evento Ctrl+C (terminar a aplicação)
+            Console.CancelKeyPress += (sender, e) => { running = false; };
 
             try
             {
-                // Cria uma ligação TCP com o Agregador
-                using (TcpClient client = new TcpClient(aggregatorIp, port))
-                using (NetworkStream stream = client.GetStream())
-                {
-                    // Envia uma mensagem inicial de "HELLO" com o ID do dispositivo
-                    SendMessage(stream, $"HELLO;{wavyId}");
-                    Console.WriteLine("HELLO enviado.");
+                // Estabelece ligação com o agregador
+                client = new TcpClient(aggregatorIp, port);
+                stream = client.GetStream();
 
-                    // Aguarda resposta do Agregador (espera um ACK ou algo semelhante)
-                    string response = ReceiveMessage(stream);
-                    Console.WriteLine("Resposta do Agregador: " + response);
+                Log("Ligado ao agregador.");
 
-                    // Simula o envio de dados de sensores
-                    string[] dataSamples =
-                    {
-                        "DATA;TemperaturaAgua;20.5",
-                        "DATA;SalinidadeAgua;35",
-                        "DATA;AlturaOndas;2.3",
-                        "DATA;VelocidadeVento;15.2"
-                    };
+                // Envia mensagem de apresentação e lê a resposta
+                SendMessage($"HELLO;{wavyId}");
+                Log("HELLO enviado: " + ReceiveMessage());
 
-                    // Envia cada amostra de dados com 1 segundo de intervalo
-                    foreach (var data in dataSamples)
-                    {
-                        SendMessage(stream, data);
-                        Console.WriteLine("Enviado: " + data);
-                        Thread.Sleep(1000); // Pausa de 1 segundo entre mensagens
-                    }
+                // Regista os sensores disponíveis no agregador
+                SendMessage($"REGISTER;{string.Join(",", sensores)}");
+                Log("REGISTER enviado: " + ReceiveMessage());
 
-                    // Após envio dos dados, envia mensagem de despedida "BYE"
-                    SendMessage(stream, "BYE");
-                    Console.WriteLine("BYE enviado.");
-                }
+                // Inicia uma thread secundária para gerar dados dos sensores
+                Thread dataThread = new Thread(GenerateData);
+                dataThread.Start();
+
+                // Loop principal (mantém a aplicação ativa)
+                while (running) { Thread.Sleep(100); }
+
+                // Processo de encerramento
+                SendMessage("BYE");
+                Log("BYE enviado: " + ReceiveMessage());
+
+                // Fecha a ligação
+                stream.Close();
+                client.Close();
+                Log("Ligação encerrada.");
             }
             catch (Exception ex)
             {
-                // Em caso de erro na ligação ou comunicação
                 Console.WriteLine("Erro: " + ex.Message);
             }
-
-            // Espera o utilizador pressionar uma tecla antes de encerrar o programa
-            Console.WriteLine("Pressiona qualquer tecla para sair...");
-            Console.ReadKey();
         }
 
-        // Função que envia uma mensagem para o Agregador via stream
-        static void SendMessage(NetworkStream stream, string message)
+        // Gera dados aleatórios para cada sensor periodicamente
+        static void GenerateData()
         {
-            byte[] buffer = Encoding.UTF8.GetBytes(message);
+            while (running)
+            {
+                foreach (var sensor in sensores)
+                {
+                    // Gera um valor aleatório consoante o tipo de sensor
+                    string value = sensor switch
+                    {
+                        "Temperatura" => (15 + rand.NextDouble() * 10).ToString("F1"),
+                        "Salinidade" => (30 + rand.NextDouble() * 5).ToString("F1"),
+                        "Ondas" => (0 + rand.NextDouble() * 5).ToString("F1"),
+                        "Vento" => (0 + rand.NextDouble() * 40).ToString("F1"),
+                        _ => "0"
+                    };
+
+                    // Envia os dados para o agregador
+                    string dataMsg = $"DATA;{sensor};{value}";
+                    SendMessage(dataMsg);
+                    Log($"Enviado: {dataMsg} → {ReceiveMessage()}");
+                    Thread.Sleep(1000); // Intervalo de 1 segundo entre sensores
+                }
+            }
+        }
+
+        // Envia uma mensagem para o agregador através da stream de rede
+        static void SendMessage(string msg)
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(msg);
             stream.Write(buffer, 0, buffer.Length);
         }
 
-        // Função que recebe uma mensagem da stream do Agregador
-        static string ReceiveMessage(NetworkStream stream)
+        // Recebe uma mensagem do agregador
+        static string ReceiveMessage()
         {
             byte[] buffer = new byte[256];
             int bytesRead = stream.Read(buffer, 0, buffer.Length);
             return Encoding.UTF8.GetString(buffer, 0, bytesRead);
+        }
+
+        // Escreve uma mensagem no log com timestamp
+        static void Log(string msg)
+        {
+            Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {msg}");
         }
     }
 }
