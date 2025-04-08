@@ -1,0 +1,122 @@
+# Sistema de Monitorização Oceânica – Resumo da Implementação
+
+## Descrição Geral
+
+Este projeto consiste num sistema distribuído de monitorização oceânica implementado em C#, baseado em **comunicação via sockets TCP**. O sistema está dividido em três aplicações principais, ligadas hierarquicamente:
+
+WAVY <--> AGREGADOR <--> SERVIDOR
+
+
+Cada componente comunica **apenas com o vizinho hierárquico direto**, segundo um protocolo estruturado e bem definido. O sistema está preparado para suportar múltiplas boias (WAVYs) a funcionar em simultâneo.
+
+---
+
+## Arquitetura e Componentes
+
+### 1. WavyApp (Boia)
+
+Cada instância de WavyApp representa uma boia com sensores. Ao iniciar:
+
+- Estabelece uma ligação TCP com o **Agregador** (porta 5000).
+- Envia mensagens definidas no protocolo:
+  - `HELLO;<id_da_boia>` → Identifica-se.
+  - `REGISTER;<lista_sensores>` → Indica os sensores disponíveis.
+  - `DATA;<sensor>;<valor>` → Envia leituras periódicas simuladas.
+  - `BYE` → Encerra a ligação.
+
+As leituras dos sensores são **geradas automaticamente e aleatoriamente** com valores realistas, simulando dados de:
+- Temperatura (°C)
+- Salinidade (PSU)
+- Ondas (m)
+- Vento (km/h)
+
+A boia envia os dados com intervalos regulares e recebe confirmações `ACK` do Agregador.
+
+---
+
+### 2. AggregatorApp
+
+Este componente funciona como um intermediário entre as WAVYs e o Servidor. Tem duas responsabilidades principais:
+
+- **Porta 5000**: Escuta ligações TCP de múltiplas WAVYs.
+- **Porta 6000**: Mantém ligação ativa com o **Servidor**.
+
+#### Responsabilidades:
+- Processa comandos recebidos das WAVYs e responde com `ACK`.
+- Reencaminha mensagens `DATA` para o Servidor no formato:
+
+AGG_DATA;wavyId;sensor;valor
+
+
+- Armazena em memória:
+- Lista de sensores por cada WAVY.
+- Últimos valores recebidos por sensor e por WAVY.
+
+Está preparado para responder a comandos do Servidor.
+
+---
+
+### 3. ServerApp
+
+Este é o componente final que armazena os dados. Ligado ao Agregador via TCP (porta 6000), recebe mensagens no seguinte formato:
+
+AGG_DATA;wavyId;sensor;valor
+
+
+
+#### Responsabilidades:
+- Regista cada linha recebida num ficheiro local:
+
+logs/dados_registados.txt
+
+
+Cada linha contém:
+- Timestamp da receção.
+- Mensagem completa recebida.
+
+- Envia uma resposta `RECEIVED` ao Agregador após guardar os dados.
+
+---
+
+## Fluxo de Funcionamento
+
+1. A **WavyApp** liga-se ao Agregador → envia `HELLO`, depois `REGISTER`.
+2. Começa a gerar dados → envia `DATA` de cada sensor a cada 1 segundo.
+3. O **AggregatorApp** reencaminha cada `DATA` para o Servidor.
+4. O **ServerApp** grava cada linha num ficheiro de log com `timestamp`.
+5. Toda a comunicação é confirmada com mensagens de resposta (`ACK`, `RECEIVED`).
+
+---
+
+## Funcionalidades Implementadas
+
+| Passo | Descrição | Estado |
+|------|-----------|--------|
+| 1 | Protocolo base entre WAVY e AGREGADOR (`HELLO`, `REGISTER`, `DATA`, `BYE`) | ✅ |
+| 2 | Geração de dados automática e contínua | ✅ |
+| 3 | Encaminhamento dos dados do AGREGADOR para o SERVIDOR | ✅ |
+| 4 | Gravação dos dados no SERVIDOR em ficheiro | ✅ |
+| 5 | Suporte a múltiplas WAVYs em simultâneo | ✅ |
+| 6 | Preparação para comandos do Servidor (LIST, STATS, RESET) | ✅ |
+
+---
+
+## Tecnologias Utilizadas
+
+- Linguagem: **C#**
+- IDE: **Visual Studio 2022**
+- Protocolo de comunicação: **TCP (Sockets)**
+- Controlo de versão: **Git + GitHub**
+
+---
+
+## Organização dos Projetos
+
+A solução Visual Studio está organizada da seguinte forma:
+
+- `WavyApp/` – Projeto da boia base.
+- `WavyApp2/`, `WavyApp3/`, ... – Outras boias adicionais.
+- `AggregatorApp/` – Agregador.
+- `ServerApp/` – Servidor final.
+
+Todos os projetos estão conectados segundo a arquitetura definida.
