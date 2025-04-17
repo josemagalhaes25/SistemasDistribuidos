@@ -1,0 +1,15 @@
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\bin\Debug\net8.0\WavyApp4.exe
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\bin\Debug\net8.0\WavyApp4.deps.json
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\bin\Debug\net8.0\WavyApp4.runtimeconfig.json
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\bin\Debug\net8.0\WavyApp4.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\bin\Debug\net8.0\WavyApp4.pdb
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\obj\Debug\net8.0\WavyApp4.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\obj\Debug\net8.0\WavyApp4.AssemblyInfoInputs.cache
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\obj\Debug\net8.0\WavyApp4.AssemblyInfo.cs
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\obj\Debug\net8.0\WavyApp4.csproj.CoreCompileInputs.cache
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\obj\Debug\net8.0\WavyApp4.sourcelink.json
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\obj\Debug\net8.0\WavyApp4.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\obj\Debug\net8.0\refint\WavyApp4.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\obj\Debug\net8.0\WavyApp4.pdb
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\obj\Debug\net8.0\WavyApp4.genruntimeconfig.cache
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\WavyApp4\obj\Debug\net8.0\ref\WavyApp4.dll

@@ -4,10 +4,27 @@
     "Projects": [
       {
         "Name": "WavyApp.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": ""
       },
       {
         "Name": "..\\WavyApp2\\WavyApp2.csproj",
+        "Action": "Start"
+      },
+      {
+        "Name": "..\\WavyApp3\\WavyApp3.csproj",
+        "Action": "Start"
+      },
+      {
+        "Name": "..\\WavyApp4\\WavyApp4.csproj",
+        "Action": "Start"
+      },
+      {
+        "Name": "..\\WavyApp5\\WavyApp5.csproj",
+        "Action": "Start"
+      },
+      {
+        "Name": "..\\WavyApp6\\WavyApp6.csproj",
         "Action": "Start"
       }
     ]
