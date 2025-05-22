@@ -1,0 +1,2 @@
+obj\Release\net8.0\Protos/Preprocessing.cs \
+obj\Release\net8.0\Protos/PreprocessingGrpc.cs: Protos/preprocessing.proto

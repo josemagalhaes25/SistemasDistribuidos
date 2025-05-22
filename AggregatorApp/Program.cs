@@ -1,99 +1,134 @@
-﻿// Aplicação Agregadora - Recebe dados de sensores de dispositivos WAVY, grava em ficheiros CSV e encaminha para um servidor central
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Grpc.Net.Client;
+using System.Threading.Tasks;
+using PreprocessingService; // Namespace gerado a partir do ficheiro .proto (gRPC)
+using RabbitMQ.Client;
+
 
 class Program
 {
-    // Configuração da porta onde o agregador escuta conexões
+
+    // Publica a mensagem formatada no RabbitMQ
+    static void PublicarNoRabbitMQ(string mensagem)
+    {
+        try
+        {
+
+            var factory = new RabbitMQ.Client.ConnectionFactory() { HostName = "localhost" };
+            using var connection = factory.CreateConnection();
+            using var channel = connection.CreateModel();
+
+            // Declara a exchange se ainda não existir
+            channel.ExchangeDeclare(exchange: "wavy_data", type: ExchangeType.Fanout);
+
+            var body = Encoding.UTF8.GetBytes(mensagem);
+
+            channel.BasicPublish(
+                exchange: "wavy_data",
+                routingKey: "",
+                basicProperties: null,
+                body: body
+            );
+
+            Console.WriteLine($"[RabbitMQ] Enviado: {mensagem}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao publicar no RabbitMQ: {ex.Message}");
+        }
+    }
+
+    // Porta onde o agregador escuta conexões de dispositivos WAVY
     static int porta = 5000;
+    // Listener TCP para aceitar conexões
     static TcpListener listener;
 
-    // Dicionário de locks para proteger escrita concorrente nos ficheiros por sensor
+    // Dicionários para gerir concorrência e registar dispositivos por sensor
     static readonly Dictionary<string, object> locksPorSensor = new();
-
-    // Dicionário para registar quais WAVYs já escreveram em cada sensor (para inserir separadores)
     static readonly Dictionary<string, HashSet<string>> wavysPorSensor = new();
 
     static void Main(string[] args)
     {
-        // Iniciar o servidor TCP na porta configurada
+        // Inicia o listener na porta definida
         listener = new TcpListener(IPAddress.Any, porta);
         listener.Start();
         Console.WriteLine($"Agregador a escutar na porta {porta}...");
 
-        // Ciclo principal - aceita novas conexões e cria threads para as tratar
+        // Loop infinito para aceitar clientes (WAVYs)
         while (true)
         {
+            // Aceita uma nova conexão
             TcpClient client = listener.AcceptTcpClient();
-            Thread thread = new(() => TratarWavy(client));
+            // Cria uma thread para tratar do dispositivo WAVY
+            Thread thread = new(() => TratarWavyAsync(client).Wait());
             thread.Start();
         }
     }
 
-    // Método que trata a comunicação com cada dispositivo WAVY conectado
-    static void TratarWavy(TcpClient client)
+    // Método assíncrono para lidar com um dispositivo WAVY
+    static async Task TratarWavyAsync(TcpClient client)
     {
         using NetworkStream stream = client.GetStream();
         byte[] buffer = new byte[256];
-        string wavyId = ""; // Armazena o identificador da WAVY
+        string wavyId = ""; // Identificador do dispositivo WAVY
 
         try
         {
             while (true)
             {
-                // Ler dados recebidos da WAVY
+                // Lê os dados enviados pelo WAVY
                 int bytes = stream.Read(buffer, 0, buffer.Length);
-                if (bytes == 0) break;
+                if (bytes == 0) break; // Se não houver dados, termina
 
                 string msg = Encoding.UTF8.GetString(buffer, 0, bytes);
                 Console.WriteLine("[WAVY] " + msg);
 
-                // Dividir a mensagem pelos separadores ';'
-                string[] partes = msg.Split(';');
+                string[] partes = msg.Split(';'); // Separa a mensagem por ';'
 
-                // Processar o comando recebido
-                switch (partes[0])
+                switch (partes[0]) // Verifica o tipo de comando
                 {
                     case "HELLO":
-                        // Mensagem de identificação inicial da WAVY
+                        // Registra o ID do WAVY
                         wavyId = partes[1];
-                        Send(stream, "HELLO_ACK"); // Enviar confirmação
+                        Send(stream, "HELLO_ACK"); // Confirma receção
                         break;
 
                     case "REGISTER":
-                        // Mensagem de registo (não usado atualmente)
-                        Send(stream, "REGISTER_ACK");
+                        Send(stream, "REGISTER_ACK"); // Confirma registo
                         break;
 
                     case "DATA":
-                        // Mensagem contendo dados de sensor
+                        // Extrai o sensor e o valor
                         string sensor = partes[1];
                         string valor = partes[2];
 
-                        // Gravar os dados no ficheiro CSV do sensor
+                        // Guarda os dados num ficheiro CSV
                         GravarEmCsv(wavyId, sensor, valor);
 
-                        // Encaminhar dados para o servidor central
-                        string mensagemServer = $"AGG_DATA;{wavyId};{sensor};{valor}";
-                        EnviarParaServidor(mensagemServer);
+                        // 🔄 Chama o serviço gRPC para pré-processar os dados (porta 5122)
+                        string dadoFormatado = await ChamarServicoGrpc(wavyId, sensor, valor, "http://localhost:5122");
 
-                        Send(stream, "RECEIVED"); // Confirmar receção
+                        // Publica no RabbitMQ
+                        PublicarNoRabbitMQ(dadoFormatado);
+
+                        // Envia os dados para o servidor central
+                        EnviarParaServidor(dadoFormatado);
+
+                        Send(stream, "RECEIVED"); // Confirma receção
                         break;
 
                     case "BYE":
-                        // Mensagem de despedida da WAVY
-                        Send(stream, "BYE_ACK");
-                        return; // Terminar esta thread
+                        Send(stream, "BYE_ACK"); // Confirma despedida
+                        return; // Termina a ligação
 
                     default:
-                        // Comando não reconhecido - enviar confirmação genérica
-                        Send(stream, "ACK");
+                        Send(stream, "ACK"); // Resposta genérica
                         break;
                 }
             }
@@ -104,32 +139,31 @@ class Program
         }
     }
 
-    // Método para gravar dados num ficheiro CSV específico do sensor
+    // Guarda os dados num ficheiro CSV organizado por sensor
     static void GravarEmCsv(string wavyId, string sensor, string valor)
     {
         string pasta = "sensores"; // Pasta onde os ficheiros são guardados
-        string ficheiro = Path.Combine(pasta, $"{sensor}.csv");
-        // Linha a gravar: data/hora, ID WAVY, valor
-        string linha = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss};{wavyId};{valor}";
+        string ficheiro = Path.Combine(pasta, $"{sensor}.csv"); // Ficheiro por sensor
+        string linha = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss};{wavyId};{valor}"; // Formato CSV
 
-        // Criar a pasta se não existir
-        Directory.CreateDirectory(pasta);
+        Directory.CreateDirectory(pasta); // Cria a pasta se não existir
 
-        // Obter ou criar um lock específico para este sensor
+        // Garante que cada sensor tem o seu próprio lock (evita concorrência)
         lock (locksPorSensor)
         {
             if (!locksPorSensor.ContainsKey(sensor))
                 locksPorSensor[sensor] = new object();
         }
 
-        // Bloquear o acesso ao ficheiro deste sensor
+        // Bloqueia o acesso ao ficheiro para evitar escrita simultânea
         lock (locksPorSensor[sensor])
         {
-            // Verificar se esta WAVY já escreveu neste sensor antes
+            // Regista o WAVY no sensor correspondente
             if (!wavysPorSensor.ContainsKey(sensor))
                 wavysPorSensor[sensor] = new HashSet<string>();
 
-            // Se for a primeira vez desta WAVY, adicionar um separador
+            // Se for a primeira vez que este WAVY envia dados para este sensor,
+            // adiciona um cabeçalho ao ficheiro CSV
             bool primeiraVez = wavysPorSensor[sensor].Add(wavyId);
 
             if (primeiraVez)
@@ -137,25 +171,25 @@ class Program
                 File.AppendAllText(ficheiro, $"# --- {wavyId} ---{Environment.NewLine}");
             }
 
-            // Gravar a linha de dados
+            // Guarda a linha no ficheiro CSV
             File.AppendAllText(ficheiro, linha + Environment.NewLine);
         }
     }
 
-    // Método para enviar dados para o servidor central
+    // Envia os dados formatados para o servidor central (porta 6000)
     static void EnviarParaServidor(string msg)
     {
         try
         {
-            // Conectar ao servidor (assumido como estando em localhost:6000)
+            // Estabelece ligação com o servidor
             using TcpClient serverClient = new TcpClient("127.0.0.1", 6000);
             using NetworkStream stream = serverClient.GetStream();
 
-            // Enviar a mensagem
+            // Envia a mensagem
             byte[] data = Encoding.UTF8.GetBytes(msg);
             stream.Write(data, 0, data.Length);
 
-            // Esperar pela resposta do servidor
+            // Lê a resposta do servidor
             byte[] buffer = new byte[256];
             int bytes = stream.Read(buffer, 0, buffer.Length);
             string resposta = Encoding.UTF8.GetString(buffer, 0, bytes);
@@ -167,10 +201,40 @@ class Program
         }
     }
 
-    // Método auxiliar para enviar respostas para a WAVY
+    // Envia uma resposta ao dispositivo WAVY
     static void Send(NetworkStream stream, string resposta)
     {
         byte[] respostaBytes = Encoding.UTF8.GetBytes(resposta);
         stream.Write(respostaBytes, 0, respostaBytes.Length);
+    }
+
+    // Chama o serviço gRPC para formatar os dados do sensor
+    static async Task<string> ChamarServicoGrpc(string wavyId, string sensor, string valor, string grpcUrl)
+    {
+        try
+        {
+            // Cria um canal gRPC para comunicar com o serviço de pré-processamento
+            using var channel = GrpcChannel.ForAddress(grpcUrl);
+            var client = new Preprocessor.PreprocessorClient(channel);
+
+            // Prepara os dados para enviar ao serviço gRPC
+            var request = new SensorData
+            {
+                Sensor = sensor,
+                Value = valor,
+                WavyId = wavyId
+            };
+
+            // Chama o método remoto e recebe a resposta
+            var reply = await client.FormatSensorDataAsync(request);
+            Console.WriteLine($"[gRPC JSON] {reply.Formatted}");
+            return reply.Formatted; // Retorna os dados formatados
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Erro ao chamar gRPC: " + ex.Message);
+            // Se o gRPC falhar, usa um formato de fallback simples
+            return $"AGG_DATA;{wavyId};{sensor};{valor}";
+        }
     }
 }

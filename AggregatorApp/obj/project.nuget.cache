@@ -1,8 +1,30 @@
 {
   "version": 2,
-  "dgSpecHash": "NLgKSPBBnQI0ZLmgyDnvTjPDmBnTOeppMYTX6QyZii069AR3ZiUzDUAsWvq7TLoRxDKLrMNI9hkXoTXZ/8B6uw==",
+  "dgSpecHash": "3AO+YeUMbLE=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Utilizador\\source\\repos\\SistemasDistribuidos\\AggregatorApp\\AggregatorApp.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\al77276\\source\\repos\\josemagalhaes25\\SistemasDistribuidos\\AggregatorApp\\AggregatorApp.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\al77276\\.nuget\\packages\\google.protobuf\\3.31.0\\google.protobuf.3.31.0.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\grpc.core.api\\2.71.0\\grpc.core.api.2.71.0.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\grpc.net.client\\2.71.0\\grpc.net.client.2.71.0.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\grpc.net.common\\2.71.0\\grpc.net.common.2.71.0.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\grpc.tools\\2.72.0\\grpc.tools.2.72.0.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\microsoft.extensions.configuration\\3.1.12\\microsoft.extensions.configuration.3.1.12.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\3.1.12\\microsoft.extensions.configuration.abstractions.3.1.12.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\microsoft.extensions.configuration.binder\\3.1.12\\microsoft.extensions.configuration.binder.3.1.12.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\3.1.12\\microsoft.extensions.dependencyinjection.3.1.12.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\3.1.12\\microsoft.extensions.dependencyinjection.abstractions.3.1.12.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\microsoft.extensions.fileproviders.abstractions\\3.1.12\\microsoft.extensions.fileproviders.abstractions.3.1.12.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\microsoft.extensions.hosting.abstractions\\3.1.12\\microsoft.extensions.hosting.abstractions.3.1.12.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\microsoft.extensions.logging\\3.1.12\\microsoft.extensions.logging.3.1.12.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\6.0.0\\microsoft.extensions.logging.abstractions.6.0.0.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\microsoft.extensions.options\\3.1.12\\microsoft.extensions.options.3.1.12.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\microsoft.extensions.primitives\\3.1.12\\microsoft.extensions.primitives.3.1.12.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\rabbitmq.client\\7.1.2\\rabbitmq.client.7.1.2.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\rabbitmq.client.core.dependencyinjection\\5.0.0\\rabbitmq.client.core.dependencyinjection.5.0.0.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\system.io.pipelines\\8.0.0\\system.io.pipelines.8.0.0.nupkg.sha512",
+    "C:\\Users\\al77276\\.nuget\\packages\\system.threading.ratelimiting\\8.0.0\\system.threading.ratelimiting.8.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

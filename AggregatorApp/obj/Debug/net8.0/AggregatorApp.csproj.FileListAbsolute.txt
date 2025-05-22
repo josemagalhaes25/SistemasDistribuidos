@@ -13,3 +13,16 @@ C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\ne
 C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.pdb
 C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.genruntimeconfig.cache
 C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\ref\AggregatorApp.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\bin\Debug\net8.0\Google.Protobuf.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\bin\Debug\net8.0\Grpc.Core.Api.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\bin\Debug\net8.0\Grpc.Net.Client.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\bin\Debug\net8.0\Grpc.Net.Common.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.csproj.AssemblyReference.cache
+C:\Users\Utilizador\source\repos\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\Aggregat.E81CBEC3.Up2Date
+C:\Users\al77276\source\repos\josemagalhaes25\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.csproj.AssemblyReference.cache
+C:\Users\al77276\source\repos\josemagalhaes25\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\al77276\source\repos\josemagalhaes25\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.AssemblyInfoInputs.cache
+C:\Users\al77276\source\repos\josemagalhaes25\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.AssemblyInfo.cs
+C:\Users\al77276\source\repos\josemagalhaes25\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.csproj.CoreCompileInputs.cache
+C:\Users\al77276\source\repos\josemagalhaes25\SistemasDistribuidos\AggregatorApp\obj\Debug\net8.0\AggregatorApp.sourcelink.json

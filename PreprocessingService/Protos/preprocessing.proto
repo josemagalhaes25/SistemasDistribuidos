@@ -1,0 +1,26 @@
+﻿// Versão do Protocolo (sempre usar proto3)
+syntax = "proto3";  
+
+// Nome do pacote em C# (onde o código vai ficar)
+option csharp_namespace = "PreprocessingService";
+
+// Nome do serviço
+package preprocessing;
+
+// Dados que vêm do sensor
+message SensorData {
+  string sensor = 1;    // Ex: "sensor_temperatura"
+  string value = 2;     // Ex: "23.5" (valor lido)
+  string wavy_id = 3;   // ID único (ex: "ABC123")
+}
+
+// Resposta depois de processar
+message ProcessedData {
+  string formatted = 1; // Ex: "Temperatura: 23.5ºC"
+}
+
+// O que este serviço faz:
+service Preprocessor {
+  // Recebe dados do sensor, devolve dados formatados
+  rpc FormatSensorData (SensorData) returns (ProcessedData);
+}

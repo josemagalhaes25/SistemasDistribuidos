@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>AggregatorApp</id>
+    <version>1.0.0</version>
+    <authors>AggregatorApp</authors>
+    <description>Package Description</description>
+    <repository type="git" commit="19160c952ce209fa8a59eaad156ca2b488ef325a" />
+    <dependencies>
+      <group targetFramework="net8.0">
+        <dependency id="Google.Protobuf" version="3.31.0" exclude="Build,Analyzers" />
+        <dependency id="Grpc.Net.Client" version="2.71.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="C:\Users\al77276\source\repos\josemagalhaes25\SistemasDistribuidos\AggregatorApp\bin\Debug\net8.0\AggregatorApp.runtimeconfig.json" target="lib\net8.0\AggregatorApp.runtimeconfig.json" />
+    <file src="C:\Users\al77276\source\repos\josemagalhaes25\SistemasDistribuidos\AggregatorApp\bin\Debug\net8.0\AggregatorApp.dll" target="lib\net8.0\AggregatorApp.dll" />
+  </files>
+</package>
