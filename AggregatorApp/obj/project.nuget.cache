@@ -1,8 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "NLgKSPBBnQI0ZLmgyDnvTjPDmBnTOeppMYTX6QyZii069AR3ZiUzDUAsWvq7TLoRxDKLrMNI9hkXoTXZ/8B6uw==",
+  "dgSpecHash": "ub4yuPPn7LLED/i80s+Bw7SEqBOIrT8Q3i4oRkbYA4afXUlx0Smf9NTnK1RUzuhkChYwXa6CqnAZH2FzCPWB1w==",
   "success": true,
   "projectFilePath": "C:\\Users\\Utilizador\\source\\repos\\SistemasDistribuidos\\AggregatorApp\\AggregatorApp.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\Utilizador\\.nuget\\packages\\google.protobuf\\3.31.0\\google.protobuf.3.31.0.nupkg.sha512",
+    "C:\\Users\\Utilizador\\.nuget\\packages\\grpc.core.api\\2.71.0\\grpc.core.api.2.71.0.nupkg.sha512",
+    "C:\\Users\\Utilizador\\.nuget\\packages\\grpc.net.client\\2.71.0\\grpc.net.client.2.71.0.nupkg.sha512",
+    "C:\\Users\\Utilizador\\.nuget\\packages\\grpc.net.common\\2.71.0\\grpc.net.common.2.71.0.nupkg.sha512",
+    "C:\\Users\\Utilizador\\.nuget\\packages\\grpc.tools\\2.72.0\\grpc.tools.2.72.0.nupkg.sha512",
+    "C:\\Users\\Utilizador\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\6.0.0\\microsoft.extensions.logging.abstractions.6.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

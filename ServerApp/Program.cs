@@ -5,25 +5,28 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Collections.Generic;
+using System.Text.Json;
 
 class Program
 {
-    // Porta onde o servidor irá escutar
+    // Porta onde o servidor vai escutar
     static int port = 6000;
     // Objeto para escutar conexões TCP
     static TcpListener server;
-    // Lista para armazenar todos os dados recebidos (thread-safe)
+    // Lista para armazenar os dados recebidos dos clientes
     static List<string> dadosRecebidos = new();
-    // Objeto para sincronização de acesso à lista de dados
+    // Objeto para sincronização de threads (evitar concorrência)
     static object lockObj = new();
+    // Objeto para sincronização de acesso ao ficheiro
+    static object fileLock = new();
 
     static void Main(string[] args)
     {
-        // Inicia o servidor numa thread separada para não bloquear a thread principal
+        // Inicia uma thread separada para o servidor
         Thread listenerThread = new(() => StartServer());
         listenerThread.Start();
 
-        // Entra no modo de comandos (LIST, STATS, RESET) na thread principal
+        // Inicia o loop de comandos na thread principal
         CommandLoop();
     }
 
@@ -34,17 +37,18 @@ class Program
         server.Start();
         Console.WriteLine($"Servidor a escutar na porta {port}...");
 
+        // Loop infinito para aceitar clientes
         while (true)
         {
-            // Aceita clientes de forma bloqueante
+            // Aceita uma nova conexão de cliente
             TcpClient client = server.AcceptTcpClient();
-            // Cria uma thread separada para cada cliente
+            // Cria uma nova thread para lidar com o cliente
             Thread clientThread = new(() => HandleClient(client));
             clientThread.Start();
         }
     }
 
-    // Método para lidar com cada cliente conectado
+    // Método para lidar com a comunicação de um cliente
     static void HandleClient(TcpClient client)
     {
         try
@@ -57,22 +61,39 @@ class Program
 
             Log("Mensagem recebida: " + message);
 
-            // Verifica se é um comando AGG_DATA (formato esperado: "AGG_DATA;sensor;valor")
+            // Tenta interpretar como JSON primeiro
+            try
+            {
+                var dado = JsonSerializer.Deserialize<Dictionary<string, string>>(message);
+                if (dado != null && dado.ContainsKey("sensor"))
+                {
+                    // Adiciona à lista de dados recebidos (com thread safety)
+                    lock (lockObj)
+                    {
+                        dadosRecebidos.Add(message);
+                    }
+                    SaveToFile(message);
+                    SendResponse(stream, "RECEIVED");
+                    return;
+                }
+            }
+            catch
+            {
+                // Se falhar o JSON, continua para verificar AGG_DATA
+            }
+
+            // Verifica se é um comando AGG_DATA
             if (message.StartsWith("AGG_DATA;"))
             {
-                lock (lockObj) // Bloqueia o acesso à lista para evitar condições de corrida
+                lock (lockObj)
                 {
                     dadosRecebidos.Add(message);
                 }
-
-                // Guarda os dados num ficheiro
                 SaveToFile(message);
-                // Envia confirmação de receção ao cliente
                 SendResponse(stream, "RECEIVED");
             }
             else
             {
-                // Responde com erro para comandos desconhecidos
                 SendResponse(stream, "UNKNOWN_COMMAND");
             }
         }
@@ -82,34 +103,36 @@ class Program
         }
         finally
         {
-            // Garante que o cliente é fechado mesmo que ocorra um erro
+            // Garante que o cliente é fechado
             client.Close();
         }
     }
 
-    // Método para enviar resposta ao cliente
+    // Envia uma resposta ao cliente
     static void SendResponse(NetworkStream stream, string response)
     {
         byte[] data = Encoding.UTF8.GetBytes(response);
         stream.Write(data, 0, data.Length);
     }
 
-    // Método para guardar dados num ficheiro de log
+    // Guarda os dados recebidos num ficheiro
     static void SaveToFile(string data)
     {
         string folder = "logs";
-        Directory.CreateDirectory(folder); // Cria a pasta se não existir
+        Directory.CreateDirectory(folder);
         string path = Path.Combine(folder, "dados_registados.txt");
 
-        // Adiciona timestamp à linha de log
         string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         string line = $"[{timestamp}] {data}";
 
-        // Adiciona a linha ao ficheiro
-        File.AppendAllText(path, line + Environment.NewLine);
+        // Garante que apenas uma thread escreve no ficheiro de cada vez
+        lock (fileLock)
+        {
+            File.AppendAllText(path, line + Environment.NewLine);
+        }
     }
 
-    // Loop de comandos para interação com o utilizador
+    // Loop para receber comandos do utilizador
     static void CommandLoop()
     {
         while (true)
@@ -120,13 +143,13 @@ class Program
             switch (command)
             {
                 case "LIST":
-                    ListData(); // Lista todos os dados recebidos
+                    ListData();
                     break;
                 case "STATS":
-                    ShowStats(); // Mostra estatísticas por tipo de sensor
+                    ShowStats();
                     break;
                 case "RESET":
-                    ResetData(); // Apaga todos os dados
+                    ResetData();
                     break;
                 default:
                     Console.WriteLine("Comando inválido. Use LIST, STATS ou RESET.");
@@ -135,10 +158,10 @@ class Program
         }
     }
 
-    // Método para listar todos os dados recebidos
+    // Lista todos os dados recebidos
     static void ListData()
     {
-        lock (lockObj) // Bloqueia o acesso à lista durante a leitura
+        lock (lockObj)
         {
             if (dadosRecebidos.Count == 0)
             {
@@ -153,7 +176,7 @@ class Program
         }
     }
 
-    // Método para mostrar estatísticas por tipo de sensor
+    // Mostra estatísticas dos dados recebidos
     static void ShowStats()
     {
         Dictionary<string, int> contagens = new();
@@ -162,14 +185,31 @@ class Program
         {
             foreach (var linha in dadosRecebidos)
             {
-                // Formato esperado: "AGG_DATA;sensor;valor"
-                string[] partes = linha.Split(';');
-                if (partes.Length >= 3)
+                try
                 {
-                    string sensor = partes[1];
-                    if (!contagens.ContainsKey(sensor))
-                        contagens[sensor] = 0;
-                    contagens[sensor]++;
+                    // Tenta processar como JSON
+                    var dado = JsonSerializer.Deserialize<Dictionary<string, string>>(linha);
+                    if (dado != null && dado.ContainsKey("sensor"))
+                    {
+                        string sensor = dado["sensor"];
+                        if (!contagens.ContainsKey(sensor)) contagens[sensor] = 0;
+                        contagens[sensor]++;
+                    }
+                    else if (linha.StartsWith("AGG_DATA;"))
+                    {
+                        // Processa no formato AGG_DATA
+                        string[] partes = linha.Split(';');
+                        if (partes.Length >= 3)
+                        {
+                            string sensor = partes[1];
+                            if (!contagens.ContainsKey(sensor)) contagens[sensor] = 0;
+                            contagens[sensor]++;
+                        }
+                    }
+                }
+                catch
+                {
+                    // Ignora linhas mal formatadas
                 }
             }
         }
@@ -181,7 +221,7 @@ class Program
         }
     }
 
-    // Método para apagar todos os dados
+    // Limpa todos os dados recebidos
     static void ResetData()
     {
         lock (lockObj)
@@ -189,17 +229,19 @@ class Program
             dadosRecebidos.Clear();
         }
 
-        // Também limpa o ficheiro de log
         string filePath = Path.Combine("logs", "dados_registados.txt");
         if (File.Exists(filePath))
         {
-            File.WriteAllText(filePath, "");
+            lock (fileLock)
+            {
+                File.WriteAllText(filePath, "");
+            }
         }
 
         Console.WriteLine("Dados apagados com sucesso.");
     }
 
-    // Método auxiliar para logging com timestamp
+    // Método auxiliar para registar mensagens com timestamp
     static void Log(string msg)
     {
         Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {msg}");

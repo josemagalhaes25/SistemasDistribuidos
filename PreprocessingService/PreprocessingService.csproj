@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Pacotes necessários para gRPC funcionar e gerar código -->
+		<PackageReference Include="Grpc.AspNetCore" Version="2.57.0" />
+		<PackageReference Include="Google.Protobuf" Version="3.25.1" />
+		<PackageReference Include="Grpc.Tools" Version="2.61.0" PrivateAssets="All" />
+	</ItemGroup>
+
+	<!-- Dizer ao Visual Studio para gerar o código C# a partir do ficheiro .proto -->
+	<ItemGroup>
+		<Protobuf Include="Protos\preprocessing.proto" GrpcServices="Server" />
+	</ItemGroup>
+
+</Project>
