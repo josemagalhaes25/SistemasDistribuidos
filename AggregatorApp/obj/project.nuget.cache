@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "ub4yuPPn7LLED/i80s+Bw7SEqBOIrT8Q3i4oRkbYA4afXUlx0Smf9NTnK1RUzuhkChYwXa6CqnAZH2FzCPWB1w==",
+  "dgSpecHash": "PIha9QXnYNW50YDKJqMcJbJQcv+0Ng5fCnqTgk4vXFfdUF9dK0jL8GXINjWgYKGPfaqJSZ+BoHdkWFeKE4ls9w==",
   "success": true,
   "projectFilePath": "C:\\Users\\Utilizador\\source\\repos\\SistemasDistribuidos\\AggregatorApp\\AggregatorApp.csproj",
   "expectedPackageFiles": [
@@ -9,7 +9,10 @@
     "C:\\Users\\Utilizador\\.nuget\\packages\\grpc.net.client\\2.71.0\\grpc.net.client.2.71.0.nupkg.sha512",
     "C:\\Users\\Utilizador\\.nuget\\packages\\grpc.net.common\\2.71.0\\grpc.net.common.2.71.0.nupkg.sha512",
     "C:\\Users\\Utilizador\\.nuget\\packages\\grpc.tools\\2.72.0\\grpc.tools.2.72.0.nupkg.sha512",
-    "C:\\Users\\Utilizador\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\6.0.0\\microsoft.extensions.logging.abstractions.6.0.0.nupkg.sha512"
+    "C:\\Users\\Utilizador\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\6.0.0\\microsoft.extensions.logging.abstractions.6.0.0.nupkg.sha512",
+    "C:\\Users\\Utilizador\\.nuget\\packages\\rabbitmq.client\\6.4.0\\rabbitmq.client.6.4.0.nupkg.sha512",
+    "C:\\Users\\Utilizador\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
+    "C:\\Users\\Utilizador\\.nuget\\packages\\system.threading.channels\\4.7.1\\system.threading.channels.4.7.1.nupkg.sha512"
   ],
   "logs": []
 }
