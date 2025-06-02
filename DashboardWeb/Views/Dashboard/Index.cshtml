@@ -1,0 +1,41 @@
+﻿@model List<DashboardWeb.Models.SensorReading>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Dashboard de Sensores</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #eee; }
+    </style>
+</head>
+<body>
+    <h1>Dashboard de Leituras</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>WAVY</th>
+                <th>Sensor</th>
+                <th>Valor</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var leitura in Model)
+            {
+                <tr>
+                    <td>@leitura.Id</td>
+                    <td>@leitura.WavyId</td>
+                    <td>@leitura.Sensor</td>
+                    <td>@leitura.Value</td>
+                    <td>@leitura.Timestamp</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>
