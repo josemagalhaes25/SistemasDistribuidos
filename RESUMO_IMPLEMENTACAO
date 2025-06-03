@@ -115,3 +115,54 @@ A solução está dividida em:
 - `ServerApp/` – Componente central que regista e processa os dados.
 
 ---
+
+Fase 2 — Comunicação com RabbitMQ + Dashboard Web
+
+1. RabbitMQ como middleware de mensagens
+O AggregatorApp publica mensagens JSON (com dados processados via gRPC) numa fila RabbitMQ chamada sensor_data.
+
+A biblioteca usada foi RabbitMQ.Client.
+
+As mensagens têm este formato:
+
+{
+  "wavy_id": "WAVY_001",
+  "sensor": "Temperatura",
+  "value": "21.3",
+  "timestamp": "2025-05-28T17:00:00Z"
+}
+
+---
+
+2. ConsumerApp
+Aplicação separada que atua como consumidor das mensagens da fila.
+
+Processa os dados recebidos em tempo real e faz inserção numa base de dados SQL Server.
+
+Os dados são inseridos na tabela SensorReadings.
+
+---
+
+3. Base de Dados SQL Server
+A base de dados chama-se SensorDB.
+
+A tabela principal (SensorReadings) guarda os dados recebidos em tempo real:
+
+CREATE TABLE SensorReadings (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    WavyId NVARCHAR(50),
+    Sensor NVARCHAR(50),
+    Value NVARCHAR(50),
+    Timestamp DATETIME
+);
+
+---
+
+4. Dashboard Web (ASP.NET Core MVC)
+Criado projeto web com ASP.NET MVC.
+
+Conectado à base de dados com SqlConnection.
+
+No DashboardController, os dados são lidos com o SensorService e apresentados numa View HTML.
+
+A página abre em https://localhost:7098/Dashboard.
