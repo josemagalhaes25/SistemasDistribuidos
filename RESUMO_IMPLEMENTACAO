@@ -115,3 +115,63 @@ A solução está dividida em:
 - `ServerApp/` – Componente central que regista e processa os dados.
 
 ---
+
+Fase 2 — Comunicação com RabbitMQ + Dashboard Web
+
+1. RabbitMQ como middleware de mensagens
+O AggregatorApp publica mensagens JSON com os dados recebidos das WAVYs, já processados via gRPC, numa exchange chamada "sensor_exchange" do tipo direct.
+
+Cada mensagem é publicada com routingKey igual ao tipo de sensor (ex: "Temperatura").
+
+Formato JSON:
+{
+  "wavy_id": "WAVY_001",
+  "sensor": "Temperatura",
+  "value": "21.3",
+  "timestamp": "2025-05-28T17:00:00Z"
+}
+
+---
+
+2. ConsumerApp
+Aplicação separada que atua como consumidor da exchange.
+
+Liga-se à exchange "sensor_exchange", escuta todos os sensores e insere os dados em tempo real numa base de dados SQL Server (tabela SensorReadings).
+
+---
+
+3. Base de Dados SQL Server
+Nome da base de dados: SensorDB
+
+Tabela:
+CREATE TABLE SensorReadings (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    WavyId NVARCHAR(50),
+    Sensor NVARCHAR(50),
+    Value NVARCHAR(50),
+    Timestamp DATETIME
+);
+
+---
+
+4. StatsService — cálculo de médias em tempo real
+Aplicação separada que também consome mensagens da exchange RabbitMQ.
+
+Mantém os últimos 10 valores por sensor e calcula a média.
+
+Guarda as médias em tempo real no ficheiro wwwroot/medias.json no formato:
+{
+  "Temperatura": 21.8,
+  "PH": 7.02,
+  ...
+}
+
+---
+
+5. Dashboard Web (ASP.NET Core MVC)
+Projeto web com:
+- Conexão à base de dados para listar todas as leituras.
+- Gráfico dinâmico com Chart.js.
+- Filtros por sensor, WAVY ID e intervalo de tempo.
+- Secção de "Médias em Tempo Real" com dados lidos via AJAX do endpoint /Dashboard/Medias.
+- Interface acessível em: https://localhost:7098/Dashboard
